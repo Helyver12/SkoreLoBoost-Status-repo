@@ -107,7 +107,7 @@ internal class ProxiedConnection
                     Trace.WriteLine("<!--SERVER TO RC ORIGINAL-->" + content);
                     content = content.Insert(content.IndexOf(roster, StringComparison.Ordinal) + roster.Length,
                         "<item jid='41c322a1-b328-495b-a004-5ccd3e45eae8@eu1.pvp.net' name='&#9;SkoreLoBoost ativo' subscription='both' puuid='41c322a1-b328-495b-a004-5ccd3e45eae8'>" +
-                        "<group priority='9999'>SkoreLoBoost Status</group>" +
+                        "<group priority='9999'>skoreloboost.com</group>" +
                         "<state>online</state>" +
                         "<id name='&#9;SkoreLoBoost ativo' tagline='...'/>" +
                         "<lol name='&#9;SkoreLoBoost ativo'/>" +
@@ -261,7 +261,7 @@ internal class ProxiedConnection
                                                "premierPresenceData":
                                                {
                                                    "rosterId": "",
-                                                   "rosterName": "Status oculto. Ignore avisos de versão.",
+                                                   "rosterName": "skoreloboost.com - Status oculto",
                                                    "rosterTag": "SKB",
                                                    "rosterType": "VCT",
                                                    "division": 0,
