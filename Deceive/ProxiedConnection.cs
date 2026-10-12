@@ -106,12 +106,12 @@ internal class ProxiedConnection
                     InsertedFakePlayer = true;
                     Trace.WriteLine("<!--SERVER TO RC ORIGINAL-->" + content);
                     content = content.Insert(content.IndexOf(roster, StringComparison.Ordinal) + roster.Length,
-                        "<item jid='41c322a1-b328-495b-a004-5ccd3e45eae8@eu1.pvp.net' name='&#9;SkoreLoBoost Status Active!' subscription='both' puuid='41c322a1-b328-495b-a004-5ccd3e45eae8'>" +
+                        "<item jid='41c322a1-b328-495b-a004-5ccd3e45eae8@eu1.pvp.net' name='&#9;SkoreLoBoost ativo' subscription='both' puuid='41c322a1-b328-495b-a004-5ccd3e45eae8'>" +
                         "<group priority='9999'>SkoreLoBoost Status</group>" +
                         "<state>online</state>" +
-                        "<id name='&#9;SkoreLoBoost Status Active!' tagline='...'/>" +
-                        "<lol name='&#9;SkoreLoBoost Status Active!'/>" +
-                        "<platforms><riot name='&#9;SkoreLoBoost Status Active' tagline='...'/></platforms>" +
+                        "<id name='&#9;SkoreLoBoost ativo' tagline='...'/>" +
+                        "<lol name='&#9;SkoreLoBoost ativo'/>" +
+                        "<platforms><riot name='&#9;SkoreLoBoost ativo' tagline='...'/></platforms>" +
                         "</item>");
                     var contentBytes = Encoding.UTF8.GetBytes(content);
                     await Incoming.WriteAsync(contentBytes, 0, contentBytes.Length);
@@ -261,8 +261,8 @@ internal class ProxiedConnection
                                                "premierPresenceData":
                                                {
                                                    "rosterId": "",
-                                                   "rosterName": "SkoreLoBoost Status is active. Ignore any version mismatch warnings.",
-                                                   "rosterTag": "SkoreLoBoost Status Active!",
+                                                   "rosterName": "Status oculto. Ignore avisos de versão.",
+                                                   "rosterTag": "SKB",
                                                    "rosterType": "VCT",
                                                    "division": 0,
                                                    "score": 0,
@@ -292,7 +292,7 @@ internal class ProxiedConnection
                                                    "isPartyCrossPlayEnabled": false,
                                                    "isPlayerCrossPlayEnabled": false,
                                                    "partyPrecisePlatformTypes": 1,
-                                                   "customGameName": "SkoreLoBoost Status Active!",
+                                                   "customGameName": "SkoreLoBoost ativo",
                                                    "customGameTeam": "",
                                                    "maxPartySize": 5,
                                                    "tournamentId": "",
