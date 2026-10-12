@@ -6,7 +6,7 @@ Ferramenta gratuita para aparecer **offline** (ou mobile) no chat da Riot Games 
 - Discord: https://discord.gg/vFp2YRZFCy
 
 ## Como usar
-1. Baixe o `SkoreLoBoostStatus.exe` na aba **Releases** deste repositório.
+1. Baixe o `SkoreLoBoostStatus.exe` na aba **Releases** deste repositório (ou pelo site, em skoreloboost.com/status).
 2. Feche o Riot Client e abra o `SkoreLoBoostStatus.exe`.
 3. Escolha o jogo. O app inicia o Riot Client por você.
 4. Use o ícone da bandeja para alternar entre online, offline e mobile.
@@ -29,6 +29,27 @@ powershell -ExecutionPolicy Bypass -File tools/stats.ps1
 ```
 
 Use `-Salvar` para guardar um registro em `tools/stats-historico.csv` e acompanhar o crescimento.
+
+## Releases e verificação do arquivo
+Cada versão é compilada **pelo próprio GitHub** a partir do código-fonte deste repositório (veja `.github/workflows/release.yml`) e publicada na aba **Releases**, junto com o hash SHA-256 do executável. Para conferir que o arquivo baixado é o original:
+
+```powershell
+Get-FileHash .\SkoreLoBoostStatus.exe -Algorithm SHA256
+```
+
+O resultado deve ser igual ao hash escrito nas notas da Release (e no arquivo `SkoreLoBoostStatus.exe.sha256`).
+
+Para publicar uma versão nova (mantenedores): aumente `AssemblyVersion` em `Deceive/Deceive.csproj`, faça o commit e envie uma tag com o mesmo número, por exemplo `git tag v1.20.1` e `git push origin v1.20.1`. O GitHub compila e cria a Release sozinho.
+
+## Acompanhando o Deceive original
+Quando a Riot muda algo, o app pode parar de funcionar até alguém corrigir, e quem costuma corrigir primeiro é o autor do Deceive. O script `tools/sync-upstream.ps1` mostra o que o projeto original mudou desde a última sincronização e, com `-Aplicar`, traz essas mudanças para uma branch separada para você revisar:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/sync-upstream.ps1
+powershell -ExecutionPolicy Bypass -File tools/sync-upstream.ps1 -Aplicar
+```
+
+O arquivo `tools/upstream-base.txt` guarda até qual commit do original este fork já está atualizado.
 
 ## Compilar
 Requer Windows e o .NET SDK.
