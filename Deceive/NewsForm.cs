@@ -95,29 +95,33 @@ internal sealed class NewsForm : Form
 
     private async System.Threading.Tasks.Task RefreshAsync()
     {
-        var (items, online) = await NewsService.FetchAsync();
+        var (items, pinned, online) = await NewsService.FetchAsync();
         if (IsDisposed)
             return;
 
         _status.Text = online
             ? "Atualizado agora."
-            : items.Count > 0
+            : items.Count > 0 || pinned is not null
                 ? "Sem conexão com o site. Mostrando as últimas novidades salvas."
                 : "Sem conexão com o site e nenhuma novidade salva ainda.";
 
-        Render(items);
+        Render(items, pinned);
 
         if (items.Count > 0)
             Persistence.SetLastSeenNewsId(items[0].Id);
     }
 
-    private void Render(List<NewsItem> items)
+    private void Render(List<NewsItem> items, PinnedPromo? pinned)
     {
         _list.SuspendLayout();
         _list.Controls.Clear();
 
         var cardWidth = _list.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 4;
-        if (items.Count == 0)
+
+        if (pinned is not null)
+            _list.Controls.Add(BuildPinnedCard(pinned, cardWidth));
+
+        if (items.Count == 0 && pinned is null)
         {
             _list.Controls.Add(new Label
             {
@@ -133,6 +137,72 @@ internal sealed class NewsForm : Form
             _list.Controls.Add(BuildCard(item, cardWidth));
 
         _list.ResumeLayout(true);
+    }
+
+    /// The pinned promo card: always first, with a full gold border and an "SKORELOBOOST" eyebrow
+    /// label so it reads as the brand's own pick rather than a regular news item.
+    private static Control BuildPinnedCard(PinnedPromo promo, int width)
+    {
+        var card = new FlowLayoutPanel
+        {
+            FlowDirection = FlowDirection.TopDown,
+            WrapContents = false,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            Width = width,
+            BackColor = Theme.PanelHover,
+            Padding = new Padding(16, 12, 10, 14),
+            Margin = new Padding(0, 0, 0, 14)
+        };
+        card.Paint += (_, e) =>
+        {
+            using var pen = new Pen(Theme.Gold, 1.5f);
+            e.Graphics.DrawRectangle(pen, 0, 0, card.Width - 1, card.Height - 1);
+        };
+
+        var textWidth = width - 40;
+        card.Controls.Add(new Label
+        {
+            Text = "SKORELOBOOST",
+            Font = new Font("Segoe UI", 8F, FontStyle.Bold),
+            ForeColor = Theme.Gold,
+            AutoSize = true,
+            Margin = new Padding(3, 0, 3, 4)
+        });
+
+        card.Controls.Add(new Label
+        {
+            Text = promo.Title,
+            Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+            ForeColor = Theme.Text,
+            AutoSize = true,
+            MaximumSize = new Size(textWidth, 0)
+        });
+
+        if (promo.Text.Length > 0)
+            card.Controls.Add(new Label
+            {
+                Text = promo.Text,
+                ForeColor = Color.FromArgb(200, 200, 210),
+                AutoSize = true,
+                MaximumSize = new Size(textWidth, 0),
+                Margin = new Padding(3, 4, 3, 0)
+            });
+
+        if (promo.Url is not null)
+        {
+            var url = promo.Url;
+            var button = new Button { Text = promo.ButtonText, Size = new Size(150, 32), Margin = new Padding(3, 10, 3, 0) };
+            button.Click += (_, _) =>
+            {
+                if (NewsService.IsAllowedUrl(url))
+                    Process.Start(url);
+            };
+            Theme.StyleButton(button, primary: true);
+            card.Controls.Add(button);
+        }
+
+        return card;
     }
 
     private static Control BuildCard(NewsItem item, int width)

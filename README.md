@@ -21,6 +21,8 @@ O app consulta `https://skoreloboost.com/status-news.json` para mostrar a tela *
 
 Para publicar uma novidade, edite esse arquivo no site seguindo o modelo em `docs/status-news.example.json`.
 
+Um objeto opcional `"pinned"` (fora da lista `"items"`) fica sempre fixado no topo da tela, acima das novidades normais — é o lugar para divulgar os serviços de eloboost sem depender de uma nova versão do app. Edite o `title`, `text`, `button` e `url` (`url` só pode apontar para skoreloboost.com, o Discord ou o GitHub do projeto) e remova o objeto inteiro para tirá-lo da tela.
+
 ## Estatísticas (para o dono do projeto)
 O script `tools/stats.ps1` mostra os downloads de cada Release e os membros do Discord. Ele não faz parte do app e só lê dados públicos:
 

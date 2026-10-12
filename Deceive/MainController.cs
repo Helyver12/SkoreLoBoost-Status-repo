@@ -47,7 +47,7 @@ internal class MainController : ApplicationContext
             var context = SynchronizationContext.Current;
             Task.Run(async () =>
             {
-                var (items, _) = await NewsService.FetchAsync();
+                var (items, _, _) = await NewsService.FetchAsync();
                 context?.Post(_ => AnnounceNews(items), null);
             });
         };
