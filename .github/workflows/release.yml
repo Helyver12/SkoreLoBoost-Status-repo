@@ -2,7 +2,11 @@ name: Release
 
 # Publica uma versão sempre que uma tag "v*" é enviada (por exemplo v1.20.1).
 # O executável é compilado aqui, no GitHub, a partir do código-fonte público deste repositório,
-# e a Release recebe também o hash SHA-256 do arquivo para qualquer pessoa conferir.
+# e a Release recebe também o hash SHA-256 do arquivo e um link para a análise no VirusTotal.
+#
+# Envio automático ao VirusTotal (opcional): crie uma chave de API gratuita em virustotal.com
+# e salve-a em Settings > Secrets and variables > Actions com o nome VT_API_KEY.
+# Sem essa chave a Release sai normalmente; só o envio do arquivo ao VirusTotal é pulado.
 on:
   push:
     tags:
@@ -14,6 +18,8 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      VT_API_KEY: ${{ secrets.VT_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,11 +46,8 @@ jobs:
       - name: Compilar
         run: dotnet build Deceive/Deceive.csproj -c Release
 
-      - name: Gerar hash e publicar a Release
+      - name: Gerar hash e notas da Release
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
           Copy-Item Deceive/bin/Release/net472/SkoreLoBoostStatus.exe dist/SkoreLoBoostStatus.exe
@@ -62,9 +65,30 @@ jobs:
 
           Para conferir no PowerShell: ``Get-FileHash .\SkoreLoBoostStatus.exe -Algorithm SHA256``
 
+          **VirusTotal:** [ver a análise deste arquivo](https://www.virustotal.com/gui/file/$hash). A análise pode levar alguns minutos para aparecer depois da publicação. Alguns antivírus podem marcar o app por engano, já que ele filtra a conexão do chat da Riot.
+
           Baseado no Deceive (molenzwiebel), licença GPL-3.0.
           "@
           $notas = ($notas -split "`n" | ForEach-Object { $_.TrimStart() }) -join "`n"
           Set-Content -Path notas.md -Value $notas -Encoding utf8
 
+      - name: Enviar ao VirusTotal (só se a chave VT_API_KEY existir)
+        if: env.VT_API_KEY != ''
+        shell: pwsh
+        run: |
+          # O envio é um extra: se falhar, a Release continua normalmente.
+          curl.exe --silent --show-error --fail --max-time 120 -X POST "https://www.virustotal.com/api/v3/files" -H "x-apikey: $env:VT_API_KEY" -F "file=@dist/SkoreLoBoostStatus.exe" | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Arquivo enviado ao VirusTotal."
+          } else {
+            Write-Warning "Não foi possível enviar ao VirusTotal (código $LASTEXITCODE). A Release continua normalmente."
+          }
+          $global:LASTEXITCODE = 0
+
+      - name: Publicar a Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
           gh release create $env:TAG dist/SkoreLoBoostStatus.exe dist/SkoreLoBoostStatus.exe.sha256 --title "SkoreLoBoost Status $env:TAG" --notes-file notas.md --verify-tag

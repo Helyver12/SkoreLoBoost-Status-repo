@@ -39,6 +39,8 @@ Get-FileHash .\SkoreLoBoostStatus.exe -Algorithm SHA256
 
 O resultado deve ser igual ao hash escrito nas notas da Release (e no arquivo `SkoreLoBoostStatus.exe.sha256`).
 
+Cada Release também traz um link para a análise do arquivo no **VirusTotal**. Se o repositório tiver o segredo `VT_API_KEY` (uma chave gratuita de API do VirusTotal, salva em *Settings → Secrets and variables → Actions*), o próprio GitHub envia o executável ao VirusTotal durante a publicação; sem a chave, a Release sai normalmente e o arquivo pode ser enviado manualmente em virustotal.com.
+
 Para publicar uma versão nova (mantenedores): aumente `AssemblyVersion` em `Deceive/Deceive.csproj`, faça o commit e envie uma tag com o mesmo número, por exemplo `git tag v1.20.1` e `git push origin v1.20.1`. O GitHub compila e cria a Release sozinho.
 
 ## Acompanhando o Deceive original
