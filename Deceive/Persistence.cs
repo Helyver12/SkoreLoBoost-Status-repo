@@ -64,6 +64,15 @@ internal static class Persistence
     internal static string GetStartupStatus() => File.Exists(StartupStatusPath) ? File.ReadAllText(StartupStatusPath) : "last";
     internal static void SetStartupStatus(string status) => File.WriteAllText(StartupStatusPath, status);
 
+    // Last saved copy of the news feed (shown when the site can't be reached) and the newest item already announced.
+    private static readonly string NewsCachePath = Path.Combine(DataDir, "newsCache.json");
+    private static readonly string LastSeenNewsPath = Path.Combine(DataDir, "lastSeenNews");
+
+    internal static string GetNewsCache() => File.Exists(NewsCachePath) ? File.ReadAllText(NewsCachePath) : string.Empty;
+    internal static void SetNewsCache(string json) => File.WriteAllText(NewsCachePath, json);
+    internal static string GetLastSeenNewsId() => File.Exists(LastSeenNewsPath) ? File.ReadAllText(LastSeenNewsPath) : string.Empty;
+    internal static void SetLastSeenNewsId(string id) => File.WriteAllText(LastSeenNewsPath, id);
+
     // Whether the introduction/welcome text has already been shown to the user.
     internal static bool GetHasShownIntroduction() => File.Exists(IntroductionShownPath);
     internal static void SetHasShownIntroduction() => File.WriteAllText(IntroductionShownPath, string.Empty);

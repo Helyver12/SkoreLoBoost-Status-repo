@@ -15,6 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\deceive.ico" />
+    <EmbeddedResource Include="Resources\skore-logo.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="5.7.0">

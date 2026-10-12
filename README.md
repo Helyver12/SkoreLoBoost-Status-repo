@@ -16,6 +16,11 @@ Apenas a sua presença global é filtrada. Lista de amigos, convites que você e
 ## Como funciona
 O app inicia o Riot Client apontando o chat para um proxy local, que reescreve apenas os pacotes de presença. Nenhuma senha ou dado de conta passa por servidores nossos.
 
+## Novidades e privacidade
+O app consulta `https://skoreloboost.com/status-news.json` para mostrar a tela **Novidades** e avisar quando há algo novo. É só um arquivo de texto: o app não envia nenhum dado seu, apenas o nome e a versão do app no pedido, como qualquer navegador. Os links da tela só abrem páginas da SkoreLoBoost, do nosso Discord e deste repositório.
+
+Para publicar uma novidade, edite esse arquivo no site seguindo o modelo em `docs/status-news.example.json`.
+
 ## Compilar
 Requer Windows e o .NET SDK.
 
@@ -38,6 +43,8 @@ Este projeto é distribuído sob a **GPL-3.0** (veja `LICENSE`). O código-fonte
 - Aviso de nova versão apontando para as Releases deste repositório
 - Opção "Iniciar com o Windows" no menu da bandeja
 - Ícone da marca também na tela de escolha do jogo
+- Visual próprio: tema escuro com dourado, logo na tela de jogos e menu da bandeja estilizado
+- Tela **Novidades**, que mostra avisos publicados no site (veja abaixo)
 - Verificação de atualização do projeto original removida
 
 O app ainda usa o certificado e o domínio de proxy hospedados pelo autor original (`mln.cx` e `deceive-localhost.molenzwiebel.xyz`). Se eles saírem do ar, o app deixa de funcionar.

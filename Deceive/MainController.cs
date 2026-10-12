@@ -26,9 +26,46 @@ internal class MainController : ApplicationContext
             BalloonTipText = "O SkoreLoBoost Status está ocultando o seu status. Clique com o botão direito no ícone da bandeja para ver as opções."
         };
         TrayIcon.ShowBalloonTip(5000);
+        TrayIcon.BalloonTipClicked += (_, _) =>
+        {
+            if (NewsBalloonShown)
+            {
+                NewsBalloonShown = false;
+                NewsForm.ShowOrFocus();
+            }
+        };
 
         LoadStatus();
         UpdateTray();
+
+        // Check the site for news a few seconds after startup, so it doesn't replace the first balloon.
+        var newsTimer = new System.Windows.Forms.Timer { Interval = 12_000 };
+        newsTimer.Tick += (_, _) =>
+        {
+            newsTimer.Stop();
+            newsTimer.Dispose();
+            var context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                var (items, _) = await NewsService.FetchAsync();
+                context?.Post(_ => AnnounceNews(items), null);
+            });
+        };
+        newsTimer.Start();
+    }
+
+    private bool NewsBalloonShown { get; set; }
+
+    private void AnnounceNews(List<NewsItem> items)
+    {
+        if (items.Count == 0 || items[0].Id == Persistence.GetLastSeenNewsId())
+            return;
+
+        Persistence.SetLastSeenNewsId(items[0].Id);
+        NewsBalloonShown = true;
+        TrayIcon.BalloonTipTitle = "Novidade: " + items[0].Title;
+        TrayIcon.BalloonTipText = "Clique para ver as novidades da SkoreLoBoost.";
+        TrayIcon.ShowBalloonTip(8000);
     }
 
     private NotifyIcon TrayIcon { get; }
@@ -126,7 +163,11 @@ internal class MainController : ApplicationContext
 
     private void UpdateTray()
     {
-        var aboutMenuItem = new ToolStripMenuItem(StartupHandler.DeceiveTitle) { Enabled = false };
+        var aboutMenuItem = new ToolStripMenuItem(StartupHandler.DeceiveTitle, null, (_, _) => Process.Start(Branding.SiteUrl))
+        {
+            Tag = "brand",
+            Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold)
+        };
 
         EnabledMenuItem = new ToolStripMenuItem("Ativado", null, async (_, _) =>
         {
@@ -257,10 +298,11 @@ internal class MainController : ApplicationContext
             Application.Exit();
         });
 
+        var newsMenuItem = new ToolStripMenuItem("Novidades", null, (_, _) => NewsForm.ShowOrFocus());
         var siteMenuItem = new ToolStripMenuItem("SkoreLoBoost - Site", null, (_, _) => Process.Start(Branding.SiteUrl));
         var discordMenuItem = new ToolStripMenuItem("SkoreLoBoost - Discord", null, (_, _) => Process.Start(Branding.DiscordUrl));
 
-        TrayIcon.ContextMenuStrip = new ContextMenuStrip();
+        TrayIcon.ContextMenuStrip = new ContextMenuStrip { Renderer = new DarkRenderer(), BackColor = Theme.Panel, ForeColor = Theme.Text };
 
 #if DEBUG
         var sendTestMsg = new ToolStripMenuItem("Send message", null, async (_, _) => { await SendMessageFromFakePlayerAsync("Test"); });
@@ -270,7 +312,7 @@ internal class MainController : ApplicationContext
             aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, mucMenuItem, sendTestMsg, restartWithDifferentGameItem, quitMenuItem
         });
 #else
-        TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, mucMenuItem, restartWithDifferentGameItem, siteMenuItem, discordMenuItem, quitMenuItem });
+        TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, mucMenuItem, restartWithDifferentGameItem, newsMenuItem, siteMenuItem, discordMenuItem, quitMenuItem });
 #endif
     }
 
