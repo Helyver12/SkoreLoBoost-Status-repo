@@ -21,6 +21,15 @@ O app consulta `https://skoreloboost.com/status-news.json` para mostrar a tela *
 
 Para publicar uma novidade, edite esse arquivo no site seguindo o modelo em `docs/status-news.example.json`.
 
+## Estatísticas (para o dono do projeto)
+O script `tools/stats.ps1` mostra os downloads de cada Release e os membros do Discord. Ele não faz parte do app e só lê dados públicos:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/stats.ps1
+```
+
+Use `-Salvar` para guardar um registro em `tools/stats-historico.csv` e acompanhar o crescimento.
+
 ## Compilar
 Requer Windows e o .NET SDK.
 
