@@ -7,7 +7,12 @@ internal partial class GamePromptForm : Form
 {
     internal static LaunchGame SelectedGame = LaunchGame.Auto;
 
-    internal GamePromptForm() => InitializeComponent();
+    internal GamePromptForm()
+    {
+        InitializeComponent();
+        // Replace the icon baked into the designer resources with the app icon.
+        Icon = Properties.Resources.DeceiveIcon;
+    }
 
     private void OnFormLoad(object sender, EventArgs e) => Text = StartupHandler.DeceiveTitle;
 

@@ -34,7 +34,11 @@ Este projeto é distribuído sob a **GPL-3.0** (veja `LICENSE`). O código-fonte
 ### Alterações em relação ao original
 - Nome, ícone, textos e links com a marca SkoreLoBoost
 - Itens de menu "Site" e "Discord" na bandeja
-- Verificação automática de atualização do projeto original desativada
+- Interface e mensagens em português
+- Aviso de nova versão apontando para as Releases deste repositório
+- Opção "Iniciar com o Windows" no menu da bandeja
+- Ícone da marca também na tela de escolha do jogo
+- Verificação de atualização do projeto original removida
 
 O app ainda usa o certificado e o domínio de proxy hospedados pelo autor original (`mln.cx` e `deceive-localhost.molenzwiebel.xyz`). Se eles saírem do ar, o app deixa de funcionar.
 

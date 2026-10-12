@@ -40,7 +40,7 @@ internal static class Utils
             httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SkoreLoBoostStatus", DeceiveVersion));
 
             var response =
-                await httpClient.GetAsync("https://api.github.com/repos/molenzwiebel/Deceive/releases/latest");
+                await httpClient.GetAsync("https://api.github.com/repos/Helyver12/SkoreLoBoost-Status-repo/releases/latest");
             var content = await response.Content.ReadAsStringAsync();
             var release = JsonSerializer.Deserialize<JsonNode>(content);
             var latestVersion = release?["tag_name"]?.ToString();
@@ -65,18 +65,19 @@ internal static class Utils
             Persistence.SetPromptedUpdateVersion(latestVersion);
 
             var result = MessageBox.Show(
-                $"There is a new version of SkoreLoBoost Status available: {latestVersion}. You are currently using SkoreLoBoost Status {DeceiveVersion}. " +
-                "SkoreLoBoost Status updates usually fix critical bugs or adapt to changes by Riot, so it is recommended that you install the latest version.\n\n" +
-                "Press OK to visit the download page, or press Cancel to continue. Don't worry, we won't bother you with this message again if you press cancel.",
+                $"Há uma nova versão do SkoreLoBoost Status: {latestVersion}. Você está usando a {DeceiveVersion}. " +
+                "As atualizações costumam corrigir erros importantes ou se adaptar a mudanças da Riot, então é recomendado instalar a versão mais recente.\n\n" +
+                "Clique em OK para abrir a página de download ou em Cancelar para continuar. Se você cancelar, não vamos mostrar este aviso de novo para esta versão.",
                 StartupHandler.DeceiveTitle,
                 MessageBoxButtons.OKCancel,
                 MessageBoxIcon.Information,
                 MessageBoxDefaultButton.Button1
             );
 
-            if (result is DialogResult.OK)
-                // Open the url in the browser.
-                Process.Start(release?["html_url"]?.ToString()!);
+            // Open the release page in the browser, but only if it really is this project's page.
+            var releaseUrl = release?["html_url"]?.ToString();
+            if (result is DialogResult.OK && releaseUrl is not null && releaseUrl.StartsWith("https://github.com/Helyver12/"))
+                Process.Start(releaseUrl);
         }
         catch
         {
@@ -123,7 +124,7 @@ internal static class Utils
             {
                 // ERROR_ACCESS_DENIED
                 MessageBox.Show(
-                    "SkoreLoBoost Status could not stop existing Riot processes because it does not have the right permissions. Please relaunch this application as an administrator and try again.",
+                    "O SkoreLoBoost Status não conseguiu fechar os processos da Riot por falta de permissão. Abra o aplicativo como administrador e tente de novo.",
                     StartupHandler.DeceiveTitle,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error,
@@ -218,7 +219,7 @@ internal static class Utils
             return;
 
         var result = MessageBox.Show(
-            "Your machine is failing to resolve some required domains. You will need to switch DNS servers or add an entry to your hosts file. Please see the SkoreLoBoost Status FAQ for more information. SkoreLoBoost Status will not work until this issue is resolved. Would you like to open the FAQ now?",
+            "O seu computador não está conseguindo resolver alguns domínios necessários. Será preciso trocar o servidor DNS ou adicionar uma linha no arquivo hosts. Veja o FAQ para mais informações (está em inglês). O SkoreLoBoost Status não vai funcionar até isso ser resolvido. Quer abrir o FAQ agora?",
             StartupHandler.DeceiveTitle,
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Question,

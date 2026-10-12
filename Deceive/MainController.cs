@@ -23,7 +23,7 @@ internal class MainController : ApplicationContext
             Icon = Resources.DeceiveIcon,
             Visible = true,
             BalloonTipTitle = StartupHandler.DeceiveTitle,
-            BalloonTipText = "SkoreLoBoost Status is currently masking your status. Right-click the tray icon for more options."
+            BalloonTipText = "O SkoreLoBoost Status está ocultando o seu status. Clique com o botão direito no ícone da bandeja para ver as opções."
         };
         TrayIcon.ShowBalloonTip(5000);
 
@@ -77,9 +77,9 @@ internal class MainController : ApplicationContext
                     {
                         Trace.WriteLine(e);
                         var result = MessageBox.Show(
-                            "Unable to connect to the chat server. Please check your internet connection. " +
-                            "If this issue persists and you can connect to chat normally without SkoreLoBoost Status, " +
-                            "please file a bug report on Discord (https://discord.gg/vFp2YRZFCy).",
+                            "Não foi possível conectar ao servidor de chat. Verifique a sua conexão com a internet. " +
+                            "Se o problema continuar e você conseguir usar o chat normalmente sem o SkoreLoBoost Status, " +
+                            "avise a gente no Discord (https://discord.gg/vFp2YRZFCy).",
                             StartupHandler.DeceiveTitle,
                             MessageBoxButtons.RetryCancel,
                             MessageBoxIcon.Error,
@@ -128,16 +128,16 @@ internal class MainController : ApplicationContext
     {
         var aboutMenuItem = new ToolStripMenuItem(StartupHandler.DeceiveTitle) { Enabled = false };
 
-        EnabledMenuItem = new ToolStripMenuItem("Enabled", null, async (_, _) =>
+        EnabledMenuItem = new ToolStripMenuItem("Ativado", null, async (_, _) =>
         {
             Enabled = !Enabled;
             await UpdateStatusAsync(Enabled ? Status : "chat");
-            await SendMessageFromFakePlayerAsync(Enabled ? "SkoreLoBoost Status is now enabled." : "SkoreLoBoost Status is now disabled.");
+            await SendMessageFromFakePlayerAsync(Enabled ? "O SkoreLoBoost Status foi ativado." : "O SkoreLoBoost Status foi desativado.");
             UpdateTray();
         })
         { Checked = Enabled };
 
-        var mucMenuItem = new ToolStripMenuItem("Enable lobby chat", null, (_, _) =>
+        var mucMenuItem = new ToolStripMenuItem("Ativar chat do lobby", null, (_, _) =>
         {
             ConnectToMuc = !ConnectToMuc;
             UpdateTray();
@@ -168,7 +168,7 @@ internal class MainController : ApplicationContext
         })
         { Checked = Status.Equals("mobile") };
 
-        var typeMenuItem = new ToolStripMenuItem("Status Type", null, ChatStatus, OfflineStatus, MobileStatus);
+        var typeMenuItem = new ToolStripMenuItem("Tipo de status", null, ChatStatus, OfflineStatus, MobileStatus);
         
         var currentStartup = Persistence.GetStartupStatus();
         var startupOnline = new ToolStripMenuItem("Online", null, (_, _) =>
@@ -192,19 +192,36 @@ internal class MainController : ApplicationContext
         })
         { Checked = currentStartup == "mobile" };
 
-        var startupLast = new ToolStripMenuItem("Remember Last", null, (_, _) =>
+        var startupLast = new ToolStripMenuItem("Lembrar o último", null, (_, _) =>
         {
             Persistence.SetStartupStatus("last");
             UpdateTray();
         })
         { Checked = currentStartup == "last" };
 
-        var startupStatusMenuItem = new ToolStripMenuItem("Default Status on Startup", null, startupOnline, startupOffline, startupMobile, startupLast);
+        var startupStatusMenuItem = new ToolStripMenuItem("Status padrão ao iniciar", null, startupOnline, startupOffline, startupMobile, startupLast);
 
-        var restartWithDifferentGameItem = new ToolStripMenuItem("Restart and launch a different game", null, (_, _) =>
+        var windowsStartupMenuItem = new ToolStripMenuItem("Iniciar com o Windows", null, (_, _) =>
+        {
+            var enable = !WindowsStartup.IsEnabled();
+            WindowsStartup.SetEnabled(enable);
+            if (enable)
+                MessageBox.Show(
+                    "O SkoreLoBoost Status vai abrir junto com o Windows e iniciar o Riot Client. " +
+                    "Para não precisar escolher o jogo toda vez, marque \"Lembrar minha escolha\" na tela de seleção de jogo " +
+                    "(use \"Reiniciar e abrir outro jogo\" no menu se quiser escolher de novo).",
+                    StartupHandler.DeceiveTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            UpdateTray();
+        })
+        { Checked = WindowsStartup.IsEnabled() };
+
+        var restartWithDifferentGameItem = new ToolStripMenuItem("Reiniciar e abrir outro jogo", null, (_, _) =>
         {
             var result = MessageBox.Show(
-                "Restart SkoreLoBoost Status to launch a different game? This will also stop related games if they are running.",
+                "Reiniciar o SkoreLoBoost Status para abrir outro jogo? Os jogos da Riot que estiverem abertos também serão fechados.",
                 StartupHandler.DeceiveTitle,
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
@@ -222,10 +239,10 @@ internal class MainController : ApplicationContext
             Environment.Exit(0);
         });
 
-        var quitMenuItem = new ToolStripMenuItem("Quit", null, (_, _) =>
+        var quitMenuItem = new ToolStripMenuItem("Sair", null, (_, _) =>
         {
             var result = MessageBox.Show(
-                "Are you sure you want to stop SkoreLoBoost Status? This will also stop related games if they are running.",
+                "Tem certeza que deseja fechar o SkoreLoBoost Status? Os jogos da Riot que estiverem abertos também serão fechados.",
                 StartupHandler.DeceiveTitle,
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
@@ -250,72 +267,72 @@ internal class MainController : ApplicationContext
 
         TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[]
         {
-            aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, mucMenuItem, sendTestMsg, restartWithDifferentGameItem, quitMenuItem
+            aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, mucMenuItem, sendTestMsg, restartWithDifferentGameItem, quitMenuItem
         });
 #else
-        TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, mucMenuItem, restartWithDifferentGameItem, siteMenuItem, discordMenuItem, quitMenuItem });
+        TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, mucMenuItem, restartWithDifferentGameItem, siteMenuItem, discordMenuItem, quitMenuItem });
 #endif
     }
 
     public async Task HandleChatMessage(string content)
     {
-        if (content.ToLower().Contains("offline"))
+        // Os comandos aceitam português e inglês. "desativar" precisa ser checado antes de "ativar".
+        var text = content.ToLower();
+
+        if (text.Contains("offline"))
         {
             if (!Enabled)
-                await SendMessageFromFakePlayerAsync("SkoreLoBoost Status is now enabled.");
+                await SendMessageFromFakePlayerAsync("O SkoreLoBoost Status foi ativado.");
             OfflineStatus.PerformClick();
         }
-        else if (content.ToLower().Contains("mobile"))
+        else if (text.Contains("mobile"))
         {
             if (!Enabled)
-                await SendMessageFromFakePlayerAsync("SkoreLoBoost Status is now enabled.");
+                await SendMessageFromFakePlayerAsync("O SkoreLoBoost Status foi ativado.");
             MobileStatus.PerformClick();
         }
-        else if (content.ToLower().Contains("online"))
+        else if (text.Contains("online"))
         {
             if (!Enabled)
-                await SendMessageFromFakePlayerAsync("SkoreLoBoost Status is now enabled.");
+                await SendMessageFromFakePlayerAsync("O SkoreLoBoost Status foi ativado.");
             ChatStatus.PerformClick();
         }
-        else if (content.ToLower().Contains("enable"))
-        {
-            if (Enabled)
-                await SendMessageFromFakePlayerAsync("SkoreLoBoost Status is already enabled.");
-            else
-                EnabledMenuItem.PerformClick();
-        }
-        else if (content.ToLower().Contains("disable"))
+        else if (text.Contains("desativar") || text.Contains("disable"))
         {
             if (!Enabled)
-                await SendMessageFromFakePlayerAsync("SkoreLoBoost Status is already disabled.");
+                await SendMessageFromFakePlayerAsync("O SkoreLoBoost Status já está desativado.");
             else
                 EnabledMenuItem.PerformClick();
         }
-        else if (content.ToLower().Contains("status"))
+        else if (text.Contains("ativar") || text.Contains("enable"))
         {
-            if (Status == "chat")
-                await SendMessageFromFakePlayerAsync("You are appearing online.");
+            if (Enabled)
+                await SendMessageFromFakePlayerAsync("O SkoreLoBoost Status já está ativado.");
             else
-                await SendMessageFromFakePlayerAsync("You are appearing " + Status + ".");
+                EnabledMenuItem.PerformClick();
         }
-        else if (content.ToLower().Contains("help"))
+        else if (text.Contains("status"))
         {
-            await SendMessageFromFakePlayerAsync("You can send the following messages to quickly change SkoreLoBoost Status settings: online/offline/mobile/enable/disable/status");
+            await SendMessageFromFakePlayerAsync("Você está aparecendo " + (Status == "chat" ? "online" : Status) + ".");
+        }
+        else if (text.Contains("ajuda") || text.Contains("help"))
+        {
+            await SendMessageFromFakePlayerAsync("Você pode enviar estas mensagens para mudar as configurações rapidamente: online / offline / mobile / ativar / desativar / status");
         }
     }
 
     private async Task SendIntroductionTextAsync()
     {
         Persistence.SetHasShownIntroduction();
-        await SendMessageFromFakePlayerAsync("Welcome! SkoreLoBoost Status is running and you are currently appearing " + Status +
-                                             ". Despite what the game client may indicate, you are appearing offline to your friends unless you manually disable SkoreLoBoost Status.");
+        await SendMessageFromFakePlayerAsync("Bem-vindo! O SkoreLoBoost Status está ativo e você está aparecendo " + (Status == "chat" ? "online" : Status) +
+                                             ". Mesmo que o cliente do jogo indique outra coisa, seus amigos veem você assim, a não ser que você desative o SkoreLoBoost Status manualmente.");
         await Task.Delay(200);
         await SendMessageFromFakePlayerAsync(
-            "If you want to invite others while being offline, you may need to disable SkoreLoBoost Status for them to accept. You can enable SkoreLoBoost Status again as soon as they are in your lobby.");
+            "Se quiser convidar outras pessoas enquanto está offline, talvez seja preciso desativar o SkoreLoBoost Status para elas aceitarem. Você pode ativar de novo assim que elas entrarem no seu lobby.");
         await Task.Delay(200);
-        await SendMessageFromFakePlayerAsync("To enable or disable SkoreLoBoost Status, or to configure other settings, find SkoreLoBoost Status in your tray icons.");
+        await SendMessageFromFakePlayerAsync("Para ativar, desativar ou mudar outras configurações, procure o SkoreLoBoost Status nos ícones da bandeja do Windows.");
         await Task.Delay(200);
-        await SendMessageFromFakePlayerAsync("Have fun!");
+        await SendMessageFromFakePlayerAsync("Bom jogo!");
     }
 
     private async Task SendMessageFromFakePlayerAsync(string message)
@@ -329,10 +346,7 @@ internal class MainController : ApplicationContext
         foreach (var connection in Connections)
             await connection.UpdateStatusAsync(newStatus);
 
-        if (newStatus == "chat")
-            await SendMessageFromFakePlayerAsync("You are now appearing online.");
-        else
-            await SendMessageFromFakePlayerAsync("You are now appearing " + newStatus + ".");
+        await SendMessageFromFakePlayerAsync("Agora você está aparecendo " + (newStatus == "chat" ? "online" : newStatus) + ".");
     }
 
     private void LoadStatus()

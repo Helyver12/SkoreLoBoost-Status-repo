@@ -47,7 +47,7 @@ namespace Deceive
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(230, 17);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Which game would you like to launch?";
+            this.label1.Text = "Qual jogo você quer abrir?";
             // 
             // buttonLaunchLoL
             // 
@@ -101,7 +101,7 @@ namespace Deceive
             this.checkboxRemember.Name = "checkboxRemember";
             this.checkboxRemember.Size = new System.Drawing.Size(397, 21);
             this.checkboxRemember.TabIndex = 5;
-            this.checkboxRemember.Text = "Remember my decision and skip this screen on future launches.";
+            this.checkboxRemember.Text = "Lembrar minha escolha e pular esta tela nas próximas vezes.";
             this.checkboxRemember.UseVisualStyleBackColor = true;
             // 
             // buttonLaunchLion

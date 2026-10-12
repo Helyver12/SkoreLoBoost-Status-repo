@@ -174,8 +174,8 @@ internal class ConfigProxy
 
             // Show a message instead of failing silently.
             MessageBox.Show(
-                "SkoreLoBoost Status was unable to rewrite a League of Legends configuration file. This normally happens because Riot changed something on their end. " +
-                "Please check if there's a new version of SkoreLoBoost Status available, or contact us on Discord (https://discord.gg/vFp2YRZFCy) if there's not.\n\n" +
+                "O SkoreLoBoost Status não conseguiu reescrever um arquivo de configuração da Riot. Isso normalmente acontece porque a Riot mudou algo. " +
+                "Verifique se há uma versão nova do SkoreLoBoost Status ou, se não houver, fale com a gente no Discord (https://discord.gg/vFp2YRZFCy).\n\n" +
                 ex,
                 StartupHandler.DeceiveTitle,
                 MessageBoxButtons.OK,

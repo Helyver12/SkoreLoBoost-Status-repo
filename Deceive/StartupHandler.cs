@@ -39,8 +39,8 @@ internal static class StartupHandler
             Trace.WriteLine(ex);
             // Show some kind of message so that Deceive doesn't just disappear.
             MessageBox.Show(
-                "SkoreLoBoost Status encountered an error and couldn't properly initialize itself. " +
-                "Please contact us on Discord (https://discord.gg/vFp2YRZFCy).\n\n" + ex,
+                "O SkoreLoBoost Status encontrou um erro e não conseguiu iniciar corretamente. " +
+                "Fale com a gente no Discord (https://discord.gg/vFp2YRZFCy).\n\n" + ex,
                 DeceiveTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error,
@@ -57,8 +57,8 @@ internal static class StartupHandler
         if (Utils.IsClientRunning() && !(riotClientParams?.Contains("allow-multiple-clients") ?? false))
         {
             var result = MessageBox.Show(
-                "The Riot Client is currently running. In order to mask your online status, the Riot Client needs to be started by SkoreLoBoost Status. " +
-                "Do you want SkoreLoBoost Status to stop the Riot Client and games launched by it, so that it can restart with the proper configuration?",
+                "O Riot Client já está aberto. Para ocultar o seu status, ele precisa ser iniciado pelo SkoreLoBoost Status. " +
+                "Quer que o SkoreLoBoost Status feche o Riot Client e os jogos abertos por ele, para reiniciar com a configuração correta?",
                 DeceiveTitle,
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
@@ -86,8 +86,8 @@ internal static class StartupHandler
         // if we can't resolve deceive-localhost.molenzwiebel.xyz to 127.0.0.1, boom
         Utils.EnsureLocalhostResolution();
 
-        // Step 0: Check for updates in the background.
-        // Update check disabled in this fork (upstream releases are for the original Deceive).
+        // Step 0: Check for updates in the background (this fork's GitHub releases).
+        _ = Utils.CheckForUpdatesAsync();
 
         // Step 1: Open a port for our chat proxy, so we can patch chat port into clientconfig.
         var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -102,8 +102,8 @@ internal static class StartupHandler
         if (riotClientPath is null)
         {
             MessageBox.Show(
-                "SkoreLoBoost Status was unable to find the path to the Riot Client. Usually this can be resolved by launching any Riot Games game once, then launching SkoreLoBoost Status again. " +
-                "If this does not resolve the issue, please file a bug report on Discord (https://discord.gg/vFp2YRZFCy).",
+                "O SkoreLoBoost Status não encontrou o Riot Client. Normalmente isso se resolve abrindo qualquer jogo da Riot uma vez e depois abrindo o SkoreLoBoost Status de novo. " +
+                "Se o problema continuar, fale com a gente no Discord (https://discord.gg/vFp2YRZFCy).",
                 DeceiveTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error,
@@ -147,9 +147,9 @@ internal static class StartupHandler
         if (serverCertificate is null)
         {
             MessageBox.Show(
-                "SkoreLoBoost Status was unable to obtain a necessary security certificate for intercepting and modifying the chat connection. This normally happens when there's " +
-                "a problem with the server that provides the certificate, but it can also be caused by network issues on your end. Please check if there's a new version" +
-                " of SkoreLoBoost Status available, check your network connection, or contact us on Discord (https://discord.gg/vFp2YRZFCy).",
+                "O SkoreLoBoost Status não conseguiu obter o certificado de segurança necessário para filtrar a conexão do chat. Isso normalmente acontece quando há " +
+                "um problema no servidor que fornece o certificado, mas também pode ser a sua conexão. Verifique se há uma versão nova do SkoreLoBoost Status, " +
+                "confira a sua internet ou fale com a gente no Discord (https://discord.gg/vFp2YRZFCy).",
                 DeceiveTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error,
