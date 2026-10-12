@@ -52,9 +52,33 @@ internal class MainController : ApplicationContext
             });
         };
         newsTimer.Start();
+
+        // Checks every 30s whether we're crossing into or out of the scheduled window.
+        var scheduleTimer = new System.Windows.Forms.Timer { Interval = 30_000 };
+        scheduleTimer.Tick += (_, _) => CheckSchedule();
+        scheduleTimer.Start();
+        CheckSchedule(); // also apply immediately if we're launched mid-window
     }
 
     private bool NewsBalloonShown { get; set; }
+    private Schedule ScheduleConfig { get; set; } = Schedule.Load();
+    private bool? ScheduleWasInsideWindow { get; set; }
+
+    private async void CheckSchedule()
+    {
+        var isInside = ScheduleConfig.IsInsideWindow(DateTime.Now);
+        if (isInside == ScheduleWasInsideWindow)
+            return;
+
+        ScheduleWasInsideWindow = isInside;
+        if (!ScheduleConfig.Enabled)
+            return;
+
+        var target = isInside ? ScheduleConfig.WindowStatus : ScheduleConfig.OutsideStatus;
+        await UpdateStatusAsync(Status = target);
+        Enabled = true;
+        UpdateTray();
+    }
 
     private void AnnounceNews(List<NewsItem> items)
     {
@@ -259,6 +283,17 @@ internal class MainController : ApplicationContext
         })
         { Checked = WindowsStartup.IsEnabled() };
 
+        var scheduleMenuItem = new ToolStripMenuItem("Agendar horários...", null, (_, _) =>
+        {
+            using var form = new ScheduleForm(ScheduleConfig);
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                ScheduleWasInsideWindow = null; // força reavaliar e aplicar agora mesmo
+                CheckSchedule();
+            }
+        })
+        { Checked = ScheduleConfig.Enabled };
+
         var restartWithDifferentGameItem = new ToolStripMenuItem("Reiniciar e abrir outro jogo", null, (_, _) =>
         {
             var result = MessageBox.Show(
@@ -309,10 +344,10 @@ internal class MainController : ApplicationContext
 
         TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[]
         {
-            aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, mucMenuItem, sendTestMsg, restartWithDifferentGameItem, quitMenuItem
+            aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, scheduleMenuItem, mucMenuItem, sendTestMsg, restartWithDifferentGameItem, quitMenuItem
         });
 #else
-        TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, mucMenuItem, restartWithDifferentGameItem, newsMenuItem, siteMenuItem, discordMenuItem, quitMenuItem });
+        TrayIcon.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { aboutMenuItem, EnabledMenuItem, typeMenuItem, startupStatusMenuItem, windowsStartupMenuItem, scheduleMenuItem, mucMenuItem, restartWithDifferentGameItem, newsMenuItem, siteMenuItem, discordMenuItem, quitMenuItem });
 #endif
     }
 
